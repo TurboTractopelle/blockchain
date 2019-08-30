@@ -15,20 +15,45 @@ console.log(chalk`{cyan Super crypto currency}`);
  * @param {String} date
  * @param {Data} data
  */
-class createBlock {
+class Block {
   constructor(index, date, data, previousHash = "") {
     (this.index = index),
       (this.date = date),
       (this.data = data),
-      (this.previousHash = previousHash);
-    this.hash = this.calculHash();
+      (this.previousHash = previousHash),
+      (this.hash = this.calculHash());
   }
 
-  async calculHash() {
+  calculHash() {
     const textToHash = this.index + this.date + JSON.stringify(this.data);
     return bcrypt.hashSync(textToHash, 10); // extToHash, salt
   }
 }
 
-const myBlock = new createBlock(0, "01/01/2019", { value: 5 });
-console.log(myBlock);
+class createChain {
+  constructor() {
+    this.chain = [new Block(0, "01/01/2019", {})];
+  }
+
+  getLastestBlock() {
+    return this.chain[this.chain.length - 1];
+  }
+
+  /**
+   * @param {Number} index
+   * @param {String} date
+   * @param {Data} data
+   */
+  addBlock(index, date, data) {
+    const block = new Block(index, date, data);
+    block.previousHash = this.getLastestBlock().hash;
+    this.chain.push(block);
+  }
+}
+
+const myChain = new createChain();
+console.log(myChain);
+
+myChain.addBlock(1, "01/01/2018", { value: 10 });
+myChain.addBlock(2, "01/01/2018", { value: 15 });
+console.log(myChain);
